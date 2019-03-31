@@ -44,7 +44,7 @@ class User(Base):
     school_num = Column(String(10))
     role = Column(Enum("teacher", "student", "none", name="user_role_enum", create_type="False"))
     tel = Column(Integer)
-    comp = relationship("UserComp", back_populates="user")
+    comps = relationship("UserComp", back_populates="user")
 
     def get_user_info(self):
         return {
@@ -91,7 +91,7 @@ class Comp(Base):
     time_end = Column(DateTime)
     tags = relationship("Tag", secondary=comp_tag_table, back_populates="comps")
     info = Column(JSON)
-    user = relationship("UserComp", back_populates="comp")
+    users = relationship("UserComp", back_populates="comp")
 
 
 class Tag(Base):
