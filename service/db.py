@@ -71,8 +71,7 @@ class User(Base):
 
     @staticmethod
     def update_user_info(**kwargs):
-
-
+        pass
 
 
 comp_tag_table = Table('comp_tag', Base.metadata,
