@@ -41,7 +41,7 @@ class TestHandler(BaseHandler):
 
 
 class AuthHandler(BaseHandler):
-    def post(self):
+    def get(self):
         if self.current_user is not None:
             # Already logged && session still alive
             self.set_status(204)
