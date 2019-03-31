@@ -1,9 +1,10 @@
-import tornado.web
-from tornado.escape import json_encode, json_decode, utf8
 import json
-from service.utils import WeChat
+
+import tornado.web
+
 from service.db import User
 from service.redis import new_login_session, get_login_openid
+from service.utils import WeChat
 
 
 class BaseHandler(tornado.web.RequestHandler):
@@ -18,6 +19,7 @@ class BaseHandler(tornado.web.RequestHandler):
 def authenticated(func):
     def inner(self, *args, **kwargs):
         if self.current_user:
+            print(f"Access: {self.current_user.open_id}")
             func(self, *args, **kwargs)
         else:
             self.set_status(403)
@@ -48,7 +50,7 @@ class AuthHandler(BaseHandler):
         user_info = WeChat.get_user_info(js_code=req_data['js_code'])
         user_uuid = new_login_session(openid=user_info['openid'], session_key=user_info['session_key'])
         self.set_header('Authorization', user_uuid)
-
+        print(f"Login: {user_uuid} {user_info['openid']}")
         if User.get_user(user_info['openid']):
             pass
         else:

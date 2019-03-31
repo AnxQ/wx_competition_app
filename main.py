@@ -1,18 +1,16 @@
-import tornado.ioloop
-import tornado.web
 import tornado.autoreload
 import tornado.httpserver
+import tornado.ioloop
+import tornado.web
 
 import service.handlers
-from config import current_config
-from service.db import *
 
 
 class Application(tornado.web.Application):
     def __init__(self):
         handlers = [
             (r"/service", service.handlers.TestHandler),
-            (r"/service/auth", service.handlers.TestHandler),
+            (r"/service/auth", service.handlers.AuthHandler),
             (r"/service/comp", service.handlers.CompetitionHandler),
             (r"/service/user", service.handlers.UserHandler)
         ]
