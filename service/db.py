@@ -1,11 +1,10 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, relationship
-from sqlalchemy import Column, String, Integer, Enum, DateTime, JSON, ForeignKey, Table
-from sqlalchemy.ext.declarative import declarative_base
-
 # sqlalchemy默认底层使用 mysqldb 完成和数据库的连接
 # 但是 mysqldb 不支持最新版本的 python 和 mysql 数据库的连接，一般用Pymysql进行替代。
 import pymysql
+from sqlalchemy import Column, String, Integer, Enum, DateTime, JSON, ForeignKey, Table
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, relationship
 
 pymysql.install_as_MySQLdb()
 
@@ -113,4 +112,4 @@ class UserComp(Base):
     comp = relationship("Comp", back_populates="comps")
 
 
-
+Base.metadata.create_all()
