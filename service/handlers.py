@@ -36,7 +36,7 @@ class TestHandler(BaseHandler):
     def post(self):
         print(self.request.remote_ip)
         print(self.request.body.decode())
-        print(self.request.arguments)
+        print(self.request.arguments['code'][0])
         print(self.request.query_arguments)
         print(self.request.headers['Host'])
 
@@ -47,8 +47,7 @@ class AuthHandler(BaseHandler):
             # Already logged && session still alive
             self.set_status(204)
             return
-        req_data = json.loads(self.request.arguments)
-        user_info = WeChat.get_user_info(js_code=req_data['js_code'])
+        user_info = WeChat.get_user_info(js_code=self.request.arguments['code'][0].decode())
         user_uuid = new_login_session(openid=user_info['openid'], session_key=user_info['session_key'])
         self.set_header('Authorization', user_uuid)
         print(f"Login: {user_uuid} {user_info['openid']}")
