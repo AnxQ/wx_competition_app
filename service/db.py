@@ -108,8 +108,8 @@ class UserComp(Base):
     user_id = Column(Integer, ForeignKey("user.id"), primary_key=True)
     comp_id = Column(Integer, ForeignKey("comp.id"), primary_key=True)
     privileges = Column(Enum("manager", "participate", "watch", name="uc_priv_enum", create_type=False))
-    user = relationship("User", back_populates="users")
-    comp = relationship("Comp", back_populates="comps")
+    user = relationship("User", back_populates="comps")
+    comp = relationship("Comp", back_populates="users")
 
 
 Base.metadata.create_all()
