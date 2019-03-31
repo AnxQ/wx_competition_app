@@ -23,3 +23,7 @@ def new_login_session(openid, session_key):
         pipe.expire(f'US:{new_uuid}', expire)
         pipe.execute()
     return new_uuid
+
+
+def clear_redis():
+    redis.flushall()

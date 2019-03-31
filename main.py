@@ -4,6 +4,7 @@ import tornado.ioloop
 import tornado.web
 
 import service.handlers
+from service.redis import clear_redis
 
 
 class Application(tornado.web.Application):
@@ -19,6 +20,7 @@ class Application(tornado.web.Application):
 
 
 if __name__ == "__main__":
+    clear_redis()
     app = tornado.httpserver.HTTPServer(Application())
     app.listen(8888)
     instance = tornado.ioloop.IOLoop.instance()
