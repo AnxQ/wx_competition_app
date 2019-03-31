@@ -9,7 +9,7 @@ from service.redis import new_login_session, get_login_openid
 class BaseHandler(tornado.web.RequestHandler):
     def get_current_user(self) -> User:
         openid = None
-        if self.request.headers.has_key['Authorization']:
+        if 'Authorization' in self.request.headers:
             openid = get_login_openid(self.request.headers['Authorization'])
         return None if openid is None else User.get_user(openid)
 
@@ -18,10 +18,12 @@ class BaseHandler(tornado.web.RequestHandler):
 def authenticated(func):
     def inner(self, *args, **kwargs):
         if self.current_user:
-            func(**kwargs)
+            func(self, *args, **kwargs)
         else:
             self.set_status(403)
             self.write("Illegal access")
+
+    return inner
 
 
 class TestHandler(BaseHandler):

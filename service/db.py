@@ -5,11 +5,11 @@ from sqlalchemy.ext.declarative import declarative_base
 
 # sqlalchemy默认底层使用 mysqldb 完成和数据库的连接
 # 但是 mysqldb 不支持最新版本的 python 和 mysql 数据库的连接，一般用Pymysql进行替代。
-# import pymysql
+import pymysql
 
-# pymysql.install_as_MySQLdb()
+pymysql.install_as_MySQLdb()
 
-engine = create_engine('mysql://root:root@localhost/wx_app', encoding='utf-8', echo=True)
+engine = create_engine('mysql://root:YXhxODg0OA==@localhost/wx_app', encoding='utf-8', echo=True)
 
 Session = sessionmaker(bind=engine)
 sess = Session()
@@ -81,7 +81,7 @@ comp_tag_table = Table('comp_tag', Base.metadata,
 
 
 class Comp(Base):
-    __talblename__ = 'comp'
+    __tablename__ = 'comp'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     status = Column(
@@ -106,11 +106,11 @@ class Tag(Base):
 class UserComp(Base):
     __tablename__ = 'user_comp'
 
-    user_id = Column(Integer, ForeignKey("user.id"))
-    comp_id = Column(Integer, ForeignKey("comp.id"))
+    user_id = Column(Integer, ForeignKey("user.id"), primary_key=True)
+    comp_id = Column(Integer, ForeignKey("comp.id"), primary_key=True)
     privileges = Column(Enum("manager", "participate", "watch", name="uc_priv_enum", create_type=False))
     user = relationship("User", back_populates="users")
     comp = relationship("Comp", back_populates="comps")
 
 
-Base.metadata.create_all()
+

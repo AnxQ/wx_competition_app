@@ -14,7 +14,7 @@ class Application(tornado.web.Application):
             (r"/service", service.handlers.TestHandler),
             (r"/service/auth", service.handlers.TestHandler),
             (r"/service/comp", service.handlers.CompetitionHandler),
-            (r"/service/user", service.handlers.CompetitionHandler)
+            (r"/service/user", service.handlers.UserHandler)
         ]
         settings = dict(debug=True, cookie_secret='66o0TzKaPOGtYdkL7xEmGepeuuYi7EPnp2XdTP1o&Vo=')
         tornado.web.Application.__init__(self, handlers, **settings)
