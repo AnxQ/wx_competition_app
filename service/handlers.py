@@ -30,8 +30,14 @@ def authenticated(func):
 
 class TestHandler(BaseHandler):
     def get(self):
-        self.write(self.current_user)
-        self.write("Hello, world")
+        self.set_status(200)
+        self.write(json.dumps({"user_info": {
+                'name': 'test',
+                'school': 'test',
+                'school_num': 'test',
+                'role': 'test',
+                'tel': 'test'
+            }}))
 
     def post(self):
         print(self.request.remote_ip)
@@ -72,7 +78,6 @@ class UserHandler(BaseHandler):
         User.update_user_info(
 
         )
-
 
 
 class CompetitionHandler(BaseHandler):
