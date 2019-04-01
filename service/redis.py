@@ -10,10 +10,10 @@ expire = 7 * 24 * 60 * 60
 
 def get_login_openid(uuid):
     try:
-        openid = redis.hmget(f'US:{uuid}')
+        openid = redis.hmget(f'US:{uuid}', 'openid')
     except ResponseError:
         return None
-    return openid
+    return openid[0]
 
 
 def new_login_session(openid, session_key):
