@@ -57,6 +57,7 @@ class AuthHandler(BaseHandler):
         user_uuid = new_login_session(openid=user_info['openid'], session_key=user_info['session_key'])
         self.set_header('Authorization', user_uuid)
         print(f"Login: {user_uuid} {user_info['openid']}")
+        # A new user
         if User.get_user(user_info['openid']):
             pass
         else:
@@ -75,9 +76,7 @@ class UserHandler(BaseHandler):
     def put(self):
         user: User = self.current_user
         req_data = json.loads(self.request.body)
-        User.update_user_info(
-
-        )
+        User.update_user_info()
 
 
 class CompetitionHandler(BaseHandler):
