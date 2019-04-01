@@ -41,7 +41,7 @@ class User(Base):
     open_id = Column(String(32), primary_key=True)
     name = Column(String(30))
     school = Column(String(30))
-    school_num = Column(String(10))
+    school_num = Column(String(20))
     role = Column(Enum("teacher", "student", "none", name="user_role_enum", create_type="False"))
     tel = Column(Integer)
     comps = relationship("UserComp", back_populates="user")
