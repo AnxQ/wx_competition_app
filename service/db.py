@@ -4,7 +4,7 @@ import enum
 import json
 
 import pymysql
-from sqlalchemy import Column, String, Integer, Enum, DateTime, JSON, ForeignKey, Table, BigInteger
+from sqlalchemy import Column, String, Integer, Enum, DateTime, JSON, ForeignKey, Table, BigInteger, Boolean
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
@@ -38,6 +38,12 @@ class DAO:
         else:
             self._session.rollback()
             self._session.close()
+
+
+class GroupPrivilege(enum.Enum):
+    creator = 0
+    admin = 1
+    member = 2
 
 
 class CompPrivilege(enum.Enum):
@@ -82,10 +88,11 @@ class User(Base):
                       default={"hide_gender": False,
                                "hide_name": False,
                                "hide_school_num": True,
-                               "allow_join": True,
+                               "allow_bejoin": True,
                                "allow_find": True})
     motto = Column(String(50))
     comps = relationship("UserComp", back_populates="user")
+    groups = relationship("UserGroup", back_populates="group")
 
     @property
     def info_json(self):
@@ -93,9 +100,9 @@ class User(Base):
             'name': self.name,
             'school': self.school,
             'school_num': self.name,
-            'role': self.role,
+            'role': self.role.value,
             'tel': self.tel,
-            'gender': self.gender,
+            'gender': self.gender.value,
             'settings': self.settings
         })
 
@@ -141,12 +148,12 @@ class Comp(Base):
     time_begin = Column(DateTime)
     time_end = Column(DateTime)
     tags = relationship("Tag", secondary=comp_tag_table, back_populates="comps")
+    platform_manage = Column(Boolean)
+    official_link = Column(String(100))
     info = Column(JSON,
                   default={"name": "",
                            "description": "",
-                           "reward": "",
-                           "": ""})
-    settings = Column(JSON)
+                           "reward": ""})
     users = relationship("UserComp", back_populates="comp")
 
     @property
@@ -158,7 +165,9 @@ class Comp(Base):
             'time_close': self.time_close,
             'time_begin': self.time_begin,
             'time_end': self.time_end,
-            'info': self.info
+            'info': self.info,
+            'platform_manage': self.platform_manage,
+            'official_link': self.official_link
         })
 
 
@@ -186,14 +195,20 @@ class Group(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(20))
     motto = Column(String(100))
-    settings = Column(JSON)
+    settings = Column(JSON,
+                      default={"max_member": 20,
+                               "allow_join": True})
+    users = relationship("UserGroup", back_populates="group")
 
 
-# class UserGroup(Base):
-#     __tablename__ = 'user_group'
-#
-#
-#     privileges = Column(Integer)
+class UserGroup(Base):
+    __tablename__ = 'user_group'
+
+    user_id = Column(Integer, ForeignKey("user.id"), primary_key=True)
+    group_id = Column(Integer, ForeignKey("group.id"), primary_key=True)
+    privileges = GroupPrivilege(Integer)
+    user = relationship("User", back_populates="groups")
+    group = relationship("group", back_populates="users")
 
 
 Base.metadata.create_all()
