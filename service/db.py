@@ -127,9 +127,9 @@ class User(Base):
         pre.name = data['name']
         pre.school = data['school']
         pre.school_num = data['school_num']
-        pre.role = UserRole(data['role'])
+        pre.role = UserRole(int(data['role']))
         pre.tel = data['tel']
-        pre.gender = UserGender(data['gender'])
+        pre.gender = UserGender(int(data['gender']))
         pre.settings = data['settings']
         db_sess.commit()
 

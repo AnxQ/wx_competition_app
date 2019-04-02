@@ -79,14 +79,14 @@ class UserHandler(BaseHandler):
     @authenticated
     def post(self):
         user: User = self.current_user
-        # try:
-        update_data = json.loads(self.request.body)
-        user.update_user_info(update_data)
-        self.set_status(200)
-        self.write(Result.Success())
-        # except Exception:
-        #     self.set_status(400)
-        #     self.write(Result.Failed(400))
+        try:
+            update_data = json.loads(self.request.body)
+            user.update_user_info(update_data)
+            self.set_status(200)
+            self.write(Result.Success())
+        except Exception:
+            self.set_status(400)
+            self.write(Result.Failed(400))
 
 
 class CompetitionHandler(BaseHandler):
