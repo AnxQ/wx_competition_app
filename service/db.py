@@ -94,7 +94,7 @@ class User(Base):
                                "allow_find": True})
     motto = Column(String(50))
     comps = relationship("UserComp", back_populates="user")
-    groups = relationship("UserGroup", back_populates="group")
+    groups = relationship("UserGroup", back_populates="user")
 
     @property
     def info_dict(self):
