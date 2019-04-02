@@ -1,5 +1,6 @@
 import json
 
+import requests
 import tornado.web
 
 from service.db import User, Comp
@@ -92,3 +93,10 @@ class CompetitionHandler(BaseHandler):
 
     def update(self):
         pass
+
+
+class ProxyHandler(BaseHandler):
+    def get(self):
+        link = self.request.arguments['link'][0].decode()
+        res = requests.get(link)
+        self.write(res.content)

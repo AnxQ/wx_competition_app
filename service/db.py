@@ -237,7 +237,7 @@ class UserGroup(Base):
 
     user_id = Column(Integer, ForeignKey("user.id"), primary_key=True)
     group_id = Column(Integer, ForeignKey("group.id"), primary_key=True)
-    privileges = GroupPrivilege(Integer)
+    privileges = Column(Enum(GroupPrivilege, name="ug_priv_enum", create_type=False))
     user = relationship("User", back_populates="groups")
     group = relationship("group", back_populates="users")
 
