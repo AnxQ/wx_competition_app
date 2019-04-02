@@ -8,6 +8,17 @@ from service.redis import new_login_session, get_login_openid
 from service.utils import WeChat
 
 
+class Result:
+    @staticmethod
+    def Success():
+        return json.dumps({"result": "success"})
+
+    @staticmethod
+    def Failed(code):
+        return json.dumps({"result": "failed",
+                           "reason": code})
+
+
 class BaseHandler(tornado.web.RequestHandler):
     def get_current_user(self) -> User:
         openid = None
@@ -68,12 +79,14 @@ class UserHandler(BaseHandler):
     @authenticated
     def post(self):
         user: User = self.current_user
-        try:
-            update_data = json.loads(self.request.body)
-            user.update_user_info(update_data)
-            self.set_status(200)
-        except Exception:
-            self.set_status(400)
+        # try:
+        update_data = json.loads(self.request.body)
+        user.update_user_info(update_data)
+        self.set_status(200)
+        self.write(Result.Success())
+        # except Exception:
+        #     self.set_status(400)
+        #     self.write(Result.Failed(400))
 
 
 class CompetitionHandler(BaseHandler):
