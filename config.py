@@ -1,6 +1,6 @@
 class Config:
     WXServerURL = "https://api.weixin.qq.com/sns/{}"
-    DatabaseURL = "mysql://root:root@localhost/wx_app"
+    DatabaseURL = "mysql://root:YXhxODg0OA==@localhost/wx_app"
     RedisURL = "redis://@localhost:6379/1"
     AppID = ""
     Secret = ""

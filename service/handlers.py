@@ -30,21 +30,14 @@ def authenticated(func):
 
 class TestHandler(BaseHandler):
     def get(self):
-        self.set_status(200)
-        self.write(json.dumps({"user_info": {
-                'name': 'test',
-                'school': 'test',
-                'school_num': 'test',
-                'role': 'test',
-                'tel': 'test'
-            }}))
+        self.write(User.get_user('openid_test').info_json)
 
     def post(self):
-        print(self.request.remote_ip)
-        print(self.request.body.decode())
-        print(self.request.arguments['code'][0])
-        print(self.request.query_arguments)
-        print(self.request.headers['Host'])
+        pass
+
+    def put(self):
+        User.new_user('openid_test')
+        self.set_status(204)
 
 
 class AuthHandler(BaseHandler):
@@ -57,7 +50,6 @@ class AuthHandler(BaseHandler):
         user_uuid = new_login_session(openid=user_info['openid'], session_key=user_info['session_key'])
         self.set_header('Authorization', user_uuid)
         print(f"Login: {user_uuid} {user_info['openid']}")
-        # A new user
         if User.get_user(user_info['openid']):
             pass
         else:
@@ -70,13 +62,14 @@ class UserHandler(BaseHandler):
     @authenticated
     def get(self):
         user: User = self.current_user
-        self.write(json.dumps(user.get_user_info()))
+        self.write(user.info_json)
 
     @authenticated
     def put(self):
         user: User = self.current_user
-        req_data = json.loads(self.request.body)
-        User.update_user_info()
+        update_data = json.loads(self.request.body)
+        res = user.update_user_info(update_data)
+        self.set_status(200)
 
 
 class CompetitionHandler(BaseHandler):
