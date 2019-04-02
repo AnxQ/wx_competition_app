@@ -101,10 +101,10 @@ class User(Base):
         return {
             'name': self.name,
             'school': self.school,
-            'school_num': self.name,
-            'role': self.role.value,
+            'school_num': self.school_num,
+            'role': self.role.value if self.role else None,
             'tel': self.tel,
-            'gender': self.gender.value,
+            'gender': self.gender.value if self.gender else None,
             'settings': self.settings
         }
 
@@ -178,7 +178,7 @@ class Comp(Base):
     def comp_dict(self):
         return {
             'id': self.id,
-            'status': self.status,
+            'status': self.status.value if self.status else None,
             'time_open': self.time_open,
             'time_close': self.time_close,
             'time_begin': self.time_begin,
