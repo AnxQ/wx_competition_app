@@ -66,7 +66,7 @@ class UserHandler(BaseHandler):
         self.write(json.dumps(user.info_dict))
 
     @authenticated
-    def update(self):
+    def post(self):
         user: User = self.current_user
         try:
             update_data = json.loads(self.request.body)
