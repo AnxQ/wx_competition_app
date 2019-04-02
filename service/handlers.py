@@ -2,7 +2,7 @@ import json
 
 import tornado.web
 
-from service.db import User
+from service.db import User, Comp
 from service.redis import new_login_session, get_login_openid
 from service.utils import WeChat
 
@@ -62,16 +62,33 @@ class UserHandler(BaseHandler):
     @authenticated
     def get(self):
         user: User = self.current_user
-        self.write(user.info_json)
+        self.write(json.dumps(user.info_dict))
 
     @authenticated
     def put(self):
         user: User = self.current_user
-        update_data = json.loads(self.request.body)
-        res = user.update_user_info(update_data)
-        self.set_status(200)
+        try:
+            update_data = json.loads(self.request.body)
+            user.update_user_info(update_data)
+            self.set_status(200)
+        except Exception:
+            self.set_status(400)
 
 
 class CompetitionHandler(BaseHandler):
     def get(self):
+        args = self.request.arguments
+        filters = json.loads(self.request.body)
+        tags = filters['tags'] if 'tags' in filters else []
+
+        def date_filter():
+            return lambda: filters['date_to'] > Comp.time_begin > filters['date_from']
+
+        require_page = args['page'][0].decode() if 'page' in args else 0
+        self.write(Comp.get_comp(comp_filters=[date_filter], tags=tags, page=require_page))
+
+    def put(self):
+        pass
+
+    def update(self):
         pass

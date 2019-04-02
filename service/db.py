@@ -1,7 +1,6 @@
 # sqlalchemy默认底层使用 mysqldb 完成和数据库的连接
 # 但是 mysqldb 不支持最新版本的 python 和 mysql 数据库的连接，一般用Pymysql进行替代。
 import enum
-import json
 
 import pymysql
 from sqlalchemy import Column, String, Integer, Enum, DateTime, JSON, ForeignKey, Table, BigInteger, Boolean
@@ -20,7 +19,9 @@ sess = Session()
 
 Base = declarative_base(bind=engine)
 
+max_page_limit = 10
 
+"""
 class DAO:
     def __enter__(self):
         self._session = Session()
@@ -38,6 +39,7 @@ class DAO:
         else:
             self._session.rollback()
             self._session.close()
+"""
 
 
 class GroupPrivilege(enum.Enum):
@@ -95,8 +97,8 @@ class User(Base):
     groups = relationship("UserGroup", back_populates="group")
 
     @property
-    def info_json(self):
-        return json.dumps({
+    def info_dict(self):
+        return {
             'name': self.name,
             'school': self.school,
             'school_num': self.name,
@@ -104,7 +106,7 @@ class User(Base):
             'tel': self.tel,
             'gender': self.gender.value,
             'settings': self.settings
-        })
+        }
 
     @staticmethod
     def get_user(openid):
@@ -138,6 +140,22 @@ comp_tag_table = Table('comp_tag', Base.metadata,
                        )
 
 
+class Tag(Base):
+    __tablename__ = 'tag'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    comps = relationship("Comp", secondary=comp_tag_table, back_populates="tags")
+    name = Column(String(10))
+
+    @property
+    def tag_dict(self):
+        return {
+            'id': self.id,
+            'comps': self.comps,
+            'name': self.name
+        }
+
+
 class Comp(Base):
     __tablename__ = 'comp'
 
@@ -157,8 +175,8 @@ class Comp(Base):
     users = relationship("UserComp", back_populates="comp")
 
     @property
-    def comp_json(self):
-        return json.dumps({
+    def comp_dict(self):
+        return {
             'id': self.id,
             'status': self.status,
             'time_open': self.time_open,
@@ -167,16 +185,29 @@ class Comp(Base):
             'time_end': self.time_end,
             'info': self.info,
             'platform_manage': self.platform_manage,
-            'official_link': self.official_link
-        })
+            'official_link': self.official_link,
+            'tags': list(map(lambda x: x.tag_dict, self.tags))
+        }
 
-
-class Tag(Base):
-    __tablename__ = 'tag'
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    comps = relationship("Comp", secondary=comp_tag_table, back_populates="tags")
-    name = Column(String(10))
+    @staticmethod
+    def get_comp(comp_filters, tags, page=0):
+        """
+        去重查询含有当前标签，满足当前过滤器的comp列表
+        :param comp_filters:
+        :param tags:
+        :param page:
+        :return:
+        """
+        db_session = Session()
+        if not tags:
+            staging_tags = db_session.query(Tag).filter(Tag.name in tags)
+            staging_comps = db_session.query(Comp).filter(staging_tags in Comp.tags)
+        staging_comps = db_session.query(Comp) \
+            .filter(comp_filters) \
+            .order_by(Comp.time_open) \
+            .offset(page * max_page_limit) \
+            .limit(max_page_limit).all()
+        return list(map(lambda x: x.comp_dict, staging_comps))
 
 
 class UserComp(Base):
