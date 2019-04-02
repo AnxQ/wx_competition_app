@@ -239,7 +239,7 @@ class UserGroup(Base):
     group_id = Column(Integer, ForeignKey("group.id"), primary_key=True)
     privileges = Column(Enum(GroupPrivilege, name="ug_priv_enum", create_type=False))
     user = relationship("User", back_populates="groups")
-    group = relationship("group", back_populates="users")
+    group = relationship("Group", back_populates="users")
 
 
 Base.metadata.create_all()
