@@ -3,7 +3,7 @@ import json
 import requests
 import tornado.web
 
-from service.db import User, Comp
+from service.db import User, Comp, CompStatus
 from service.redis import new_login_session, get_login_openid
 from service.utils import WeChat
 
@@ -17,6 +17,11 @@ class Result:
     def Failed(code):
         return json.dumps({"result": "failed",
                            "reason": code})
+
+    @staticmethod
+    def Redirect(route):
+        return json.dumps({"result": "redirect",
+                           "router": route})
 
 
 class BaseHandler(tornado.web.RequestHandler):
@@ -42,13 +47,14 @@ def authenticated(func):
 
 class TestHandler(BaseHandler):
     def get(self):
-        self.write(User.get_user('openid_test').info_json)
+        self.write(Comp.get_comp(1))
 
     def post(self):
         pass
 
     def put(self):
-        User.new_user('openid_test')
+        comp = Comp(status=CompStatus.open)
+        comp.new_comp()
         self.set_status(204)
 
 
@@ -66,7 +72,7 @@ class AuthHandler(BaseHandler):
             pass
         else:
             User.new_user(user_info['openid'])
-
+            self.write(Result.Redirect(""))
         self.set_status(204)
 
 
@@ -89,22 +95,34 @@ class UserHandler(BaseHandler):
             self.write(Result.Failed(400))
 
 
-class CompetitionHandler(BaseHandler):
+class CompetitionsHandler(BaseHandler):
     def get(self):
         args = self.request.arguments
-        filters = json.loads(self.request.body)
-        tags = filters['tags'] if 'tags' in filters else []
+        filters = json.loads(self.request.body) if self.request.body else None
+        tags = args['tags'] if 'tags' in args else []
 
         def date_filter():
             return lambda: filters['date_to'] > Comp.time_begin > filters['date_from']
 
         require_page = args['page'][0].decode() if 'page' in args else 0
-        self.write(Comp.get_comp(comp_filters=[date_filter], tags=tags, page=require_page))
+        self.write(json.dumps(Comp.get_comps(comp_filters=[], tags=tags, page=require_page)))
+
+
+class CompetitionHandler(BaseHandler):
+    def get(self):
+        args = self.request.arguments
+        if "id" in args:
+            res = Comp.get_comp(comp_id=args["id"])
+            self.write(json.dumps(res))
+            self.set_status(200)
+        else:
+            self.write(Result.Failed("Argument Illegal."))
+            self.set_status(400)
 
     def put(self):
         pass
 
-    def update(self):
+    def post(self):
         pass
 
 

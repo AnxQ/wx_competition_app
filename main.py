@@ -12,6 +12,7 @@ class Application(tornado.web.Application):
         handlers = [
             (r"/service", service.handlers.TestHandler),
             (r"/service/auth", service.handlers.AuthHandler),
+            (r"/service/comps", service.handlers.CompetitionsHandler),
             (r"/service/comp", service.handlers.CompetitionHandler),
             (r"/service/user", service.handlers.UserHandler),
             (r"/service/proxy", service.handlers.ProxyHandler)
