@@ -73,7 +73,7 @@ class AuthHandler(BaseHandler):
         else:
             User.new_user(user_info['openid'])
             self.write(Result.Redirect(""))
-        self.set_status(204)
+        self.set_status(200)
 
 
 class UserHandler(BaseHandler):
